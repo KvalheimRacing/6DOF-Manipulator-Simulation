@@ -21,4 +21,4 @@ with functioning `ROS` control.
 $ roslaunch crustcrawler_gazebo controller.launch
 ```
 
-From here only the imagination (and bad physics simulation) is the limit!
+Now only our imagination (and bad physics simulation) is the limit!
