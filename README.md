@@ -1,10 +1,8 @@
-# CrustCrawler
-This repository contains the robot simulation tools for ROBINs CrustCrawlers.
+# 6DOF-Manipulator-Simulation
+This repo contains simulation nodes in ROS for a 6DOF robot arm.
 The code is based on [`ROS`](http://ros.org), [Gazebo](http://gazebosim.org) and
 [`URDF`](http://wiki.ros.org/urdf).
 
-## Install
-Follow the guide on the [wiki](https://github.uio.no/INF3480/crustcrawler_simulation/wiki/Setup).
 
 ## Build
 To build the packages run:
