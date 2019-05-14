@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<launch>
+	<!-- World to spawn model inside, with respect to Gazebo worlds -->
+	<arg name="world_name" default="worlds/empty.world"/>
+	<!-- Spawn model with gripper attached? -->
+	<arg name="gripper_enabled" default="true"/>
+	<!-- Should the simulation start paused? -->
+	<arg name="paused" default="false" />
+	<!-- Should Gazebo spawn GUI? -->
+	<arg name="gui" default="true" />
+	
+	<arg name="full_arm" default="false" />
+	<arg name="tek4030" default="false" />
+
+	<include file="$(find gazebo_ros)/launch/empty_world.launch">
+		<arg name="world_name" value="$(arg world_name)"/>
+		<arg name="gui" value="$(arg gui)" />
+		<arg name="paused" value="$(arg paused)" />
+	</include>
+
+	<include file="$(find crustcrawler_gazebo)/launch/spawn_crustcrawler.launch">
+		<arg name="gripper_enabled" value="$(arg gripper_enabled)"/>
+		<arg name="full_arm" value="$(arg full_arm)" />
+		<arg name="tek4030" value="$(arg tek4030)" />
+	</include>
+</launch>

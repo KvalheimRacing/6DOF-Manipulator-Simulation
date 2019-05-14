@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+	<xacro:include filename="$(find crustcrawler_description)/urdf/inertias.urdf.xacro" />
+
+	<xacro:property name="turntable_width" value="0.118" />
+	<xacro:property name="turntable_length" value="${turntable_width}" />
+	<xacro:property name="turntable_height" value="0.0425" />
+	<xacro:property name="turntable_weight" value="0.435" />
+
+	<xacro:property name="disk_radius" value="0.05825" />
+	<xacro:property name="disk_height" value="0.0015" />
+	<xacro:property name="disk_weight" value="0.0413" />
+
+	<xacro:property name="turntable_spacer_radius" value="0.0135" />
+	<xacro:property name="turntable_spacer_height" value="0.00945" />
+	<!-- TODO: find proper weight for spacer: -->
+	<xacro:property name="turntable_spacer_weight" value="${disk_weight}" />
+
+	<xacro:macro name="turntable_base" params="name">
+		<link name="${name}">
+			<visual>
+				<origin xyz="0 0 ${turntable_height/2}" />
+				<geometry>
+					<box size="${turntable_width} ${turntable_length} ${turntable_height}" />
+				</geometry>
+			</visual>
+
+			<collision>
+				<origin xyz="0 0 ${turntable_height/2}" />
+				<geometry>
+					<box size="${turntable_width} ${turntable_length} ${turntable_height}" />
+				</geometry>
+			</collision>
+			<xacro:box_inertia mass="${turntable_weight}" width="${turntable_width}"
+				length="${turntable_length}" height="${turntable_height}" />
+		</link>
+	</xacro:macro>
+
+	<xacro:macro name="turntable_disk" params="name">
+		<link name="${name}">
+			<visual>
+				<origin xyz="0 0 ${disk_height/2}" />
+				<geometry>
+					<cylinder length="${disk_height}" radius="${disk_radius}"/>
+				</geometry>
+			</visual>
+
+			<collision>
+				<origin xyz="0 0 ${disk_height/2}" />
+				<geometry>
+					<cylinder length="${disk_height}" radius="${disk_radius}"/>
+				</geometry>
+			</collision>
+			<xacro:cylinder_inertia mass="${disk_weight}" radius="${disk_radius}"
+				height="${disk_height}" />
+		</link>
+	</xacro:macro>
+
+	<xacro:macro name="turntable_spacer" params="name">
+		<link name="${name}">
+			<visual>
+				<origin xyz="0 0 ${turntable_spacer_height/2}" />
+				<geometry>
+					<cylinder length="${turntable_spacer_height}" radius="${turntable_spacer_radius}"/>
+				</geometry>
+			</visual>
+
+			<collision>
+				<origin xyz="0 0 ${turntable_spacer_height/2}" />
+				<geometry>
+					<cylinder length="${turntable_spacer_height}" radius="${turntable_spacer_radius}"/>
+				</geometry>
+			</collision>
+
+			<xacro:cylinder_inertia mass="${turntable_spacer_weight}"
+				radius="${turntable_spacer_radius}"
+				height="${turntable_spacer_height}" />
+		</link>
+	</xacro:macro>
+
+	<!-- Main macro to utilize: -->
+	<xacro:macro name="turntable" params="name">
+		<xacro:turntable_base name="${name}_base" />
+		<xacro:turntable_spacer name="${name}_spacer" />
+		<xacro:turntable_disk name="${name}_disk" />
+		<joint name="joint_1" type="revolute">
+			<parent link="${name}_base" />
+			<child link="${name}_spacer" />
+			<axis xyz="0 0 1" />
+			<origin xyz="0 0 ${turntable_height}" />
+			<limit
+				lower="-3.1415" upper="3.1415"
+				effort="6.0" velocity="6.597" />
+			<dynamics friction="0.1" damping="0.0952" />
+		</joint>
+
+		<joint name="${name}_fixed_joint" type="fixed">
+			<parent link="${name}_spacer" />
+			<child link="${name}_disk" />
+			<origin xyz="0 0 ${turntable_spacer_height}" />
+		</joint>
+	</xacro:macro>
+
+</robot>

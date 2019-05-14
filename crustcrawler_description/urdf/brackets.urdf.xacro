@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+	<xacro:include filename="$(find crustcrawler_description)/urdf/inertias.urdf.xacro" />
+
+	<xacro:property name="large_bracket_width" value="0.102" />
+	<xacro:property name="large_bracket_length" value="0.032" />
+	<xacro:property name="large_bracket_height" value="0.002" />
+	<xacro:property name="large_bracket_weight" value="0.0152" />
+
+	<xacro:property name="small_bracket_width" value="0.051" />
+	<xacro:property name="small_bracket_length" value="0.0315" />
+	<xacro:property name="small_bracket_height" value="0.002" />
+	<!-- TODO: Check weight properly -->
+	<xacro:property name="small_bracket_weight" value="0.0080" />
+
+	<xacro:property name="large_girder_width" value="0.0255" />
+	<xacro:property name="large_girder_length" value="0.0255" />
+	<xacro:property name="large_girder_height" value="0.127" />
+	<xacro:property name="large_girder_weight" value="0.039" />
+
+	<xacro:property name="small_girder_width" value="0.0255" />
+	<xacro:property name="small_girder_length" value="0.0255" />
+	<xacro:property name="small_girder_height" value="0.0635" />
+	<xacro:property name="small_girder_weight" value="0.024" />
+
+	<xacro:macro name="large_bracket" params="name">
+		<link name="${name}">
+			<visual>
+				<origin xyz="0 0 ${large_bracket_height/2}" />
+				<geometry>
+					<box size="${large_bracket_width} ${large_bracket_length} ${large_bracket_height}" />
+				</geometry>
+			</visual>
+
+			<collision>
+				<origin xyz="0 0 ${large_bracket_height/2}" />
+				<geometry>
+					<box size="${large_bracket_width} ${large_bracket_length} ${large_bracket_height}" />
+				</geometry>
+			</collision>
+			<xacro:box_inertia mass="${large_bracket_weight}" width="${large_bracket_width}"
+				length="${large_bracket_length}" height="${large_bracket_height}" />
+		</link>
+	</xacro:macro>
+
+	<xacro:macro name="small_bracket" params="name">
+		<link name="${name}">
+			<visual>
+				<origin xyz="0 0 ${small_bracket_height/2}" />
+				<geometry>
+					<box size="${small_bracket_width} ${small_bracket_length} ${small_bracket_height}" />
+				</geometry>
+			</visual>
+
+			<collision>
+				<origin xyz="0 0 ${small_bracket_height/2}" />
+				<geometry>
+					<box size="${small_bracket_width} ${small_bracket_length} ${small_bracket_height}" />
+				</geometry>
+			</collision>
+			<xacro:box_inertia mass="${small_bracket_weight}" width="${small_bracket_width}"
+				length="${small_bracket_length}" height="${small_bracket_height}" />
+		</link>
+	</xacro:macro>
+
+	<xacro:macro name="large_girder" params="name">
+		<link name="${name}">
+			<visual>
+				<origin xyz="0 0 ${large_girder_height/2}" />
+				<geometry>
+					<box size="${large_girder_width} ${large_girder_length} ${large_girder_height}" />
+				</geometry>
+			</visual>
+
+			<collision>
+				<origin xyz="0 0 ${large_girder_height/2}" />
+				<geometry>
+					<box size="${large_girder_width} ${large_girder_length} ${large_girder_height}" />
+				</geometry>
+			</collision>
+			<xacro:box_inertia mass="${large_girder_weight}" width="${large_girder_width}"
+				length="${large_girder_length}" height="${large_girder_height}" />
+		</link>
+	</xacro:macro>
+
+	<xacro:macro name="small_girder" params="name">
+		<link name="${name}">
+			<visual>
+				<origin xyz="0 0 ${small_girder_height/2}" />
+				<geometry>
+					<box size="${small_girder_width} ${small_girder_length} ${small_girder_height}" />
+				</geometry>
+			</visual>
+
+			<collision>
+				<origin xyz="0 0 ${small_girder_height/2}" />
+				<geometry>
+					<box size="${small_girder_width} ${small_girder_length} ${small_girder_height}" />
+				</geometry>
+			</collision>
+			<xacro:box_inertia mass="${small_girder_weight}" width="${small_girder_width}"
+				length="${small_girder_length}" height="${small_girder_height}" />
+		</link>
+	</xacro:macro>
+
+</robot>

@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<launch>
+	<!-- Should the gripper be enabled -->
+	<arg name="gripper_enabled" default="true" />
+	<arg name="control" default="effort" doc="Control type for joints" />
+	<arg name="full_arm" default="true" />
+	<arg name="tek4030" default="true" />
+
+	<!-- Launch robot in Gazebo: -->
+	<include file="$(find crustcrawler_gazebo)/launch/empty_world.launch">
+		<arg name="gripper_enabled" value="$(arg gripper_enabled)" />
+		<arg name="full_arm" value="$(arg full_arm)" />
+		<arg name="tek4030" value="$(arg tek4030)" />
+	</include>
+	<!-- Launch control code -->
+	<include file="$(find crustcrawler_control)/launch/control.launch">
+		<arg name="control" value="$(arg control)" />
+		<arg name="full_arm" value="true" />
+	</include>
+</launch>

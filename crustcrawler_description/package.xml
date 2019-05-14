@@ -1,0 +1,16 @@
+<package format="2">
+	<name>crustcrawler_description</name>
+	<version>0.0.1</version>
+
+	<description>This package contains the robot description for the
+		CrustCrawler</description>
+	<author email="jorgehn@student.matnat.uio.no">Jørgen Nordmoen</author>
+
+	<maintainer email="jorgehn@student.matnat.uio.no">Jørgen Nordmoen</maintainer>
+
+	<license>MIT</license>
+
+	<buildtool_depend>catkin</buildtool_depend>
+	<build_depend>roslaunch</build_depend>
+	<exec_depend>xacro</exec_depend>
+</package>

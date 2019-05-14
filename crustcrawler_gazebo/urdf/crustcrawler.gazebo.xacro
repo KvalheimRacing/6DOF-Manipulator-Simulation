@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<robot name="crustcrawler" xmlns:xacro="http://ros.org/wiki/xacro">
+	<xacro:arg name="gripper_enabled" default="false" />
+	<xacro:arg name="full_arm" default="true" />
+	<xacro:arg name="tek4030" default="false" />
+
+	<!-- Include description of robot -->
+	<xacro:include filename="$(find crustcrawler_description)/urdf/crustcrawler.urdf.xacro" />
+
+	<!-- Gazebo plugin for ROS control -->
+	<gazebo>
+		<plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+			<robotNamespace>/crustcrawler</robotNamespace>
+			<robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+		</plugin>
+		<self_collide>true</self_collide>
+	</gazebo>
+
+	<!-- The robot is included here: -->
+	<xacro:crustcrawler_robot />
+	<!-- Connect robot base to world -->
+	<gazebo reference="world" />
+	<link name="world" />
+	<joint name="world_fixed" type="fixed">
+		<origin xyz="0 0 0" />
+		<parent link="world" />
+		<child link="dummy_root" />
+	</joint>
+</robot>

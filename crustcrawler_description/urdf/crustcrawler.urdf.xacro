@@ -1,0 +1,332 @@
+<?xml version="1.0"?>
+<robot name="crustcrawler_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+	<xacro:include filename="$(find crustcrawler_description)/urdf/brackets.urdf.xacro" />
+	<xacro:include filename="$(find crustcrawler_description)/urdf/gripper.urdf.xacro" />
+	<xacro:include filename="$(find crustcrawler_description)/urdf/mx28at.urdf.xacro" />
+	<xacro:include filename="$(find crustcrawler_description)/urdf/mx64at.urdf.xacro" />
+	<xacro:include filename="$(find crustcrawler_description)/urdf/turntable.urdf.xacro" />
+
+	<!-- Helper macros: -->
+	<xacro:macro name="dual_axis">
+		<xacro:large_bracket name="dual_axis_bottom" />
+		<xacro:mx64at_with_bottom name="dual_axis1" />
+		<xacro:mx64at_with_bottom name="dual_axis2" />
+		<joint name="dual_axis1_fixed" type="fixed">
+			<parent link="dual_axis_bottom" />
+			<child link="dual_axis1_bottom" />
+			<origin xyz="0.037 0 ${large_bracket_height}" />
+		</joint>
+		<joint name="dual_axis2_fixed" type="fixed">
+			<parent link="dual_axis_bottom" />
+			<child link="dual_axis2_bottom" />
+			<origin xyz="-0.037 0 ${large_bracket_height}" />
+		</joint>
+		<link name="dual_axis_top">
+			<visual>
+				<origin xyz="0 0 ${large_bracket_height/2 + 0.036}" />
+				<geometry>
+					<box size="${large_bracket_width} ${large_bracket_length} ${large_bracket_height}" />
+				</geometry>
+			</visual>
+			<collision>
+				<origin xyz="0 0 ${large_bracket_height/2 + 0.036}" />
+				<geometry>
+					<box size="${large_bracket_width} ${large_bracket_length} ${large_bracket_height}" />
+				</geometry>
+			</collision>
+			<inertial>
+				<origin xyz="0 0 ${large_bracket_height/2}" />
+				<mass value="${large_bracket_weight}" />
+				<inertia
+					ixx="${1.0/12.0 * large_bracket_weight *
+					(large_bracket_height ** 2 + large_bracket_length ** 2)}" ixy="0" ixz="0"
+					iyy="${1.0/12.0 * large_bracket_weight *
+					(large_bracket_width ** 2 + large_bracket_length ** 2)}" iyz="0"
+					izz="${1.0/12.0 * large_bracket_weight *
+					(large_bracket_width ** 2 + large_bracket_height ** 2)}" />
+			</inertial>
+		</link>
+		<joint name="joint_2" type="revolute">
+			<parent link="dual_axis_bottom" />
+			<child link="dual_axis_top" />
+			<origin xyz="0 0 0.0550" />
+			<limit
+				lower="-1.9" upper="1.9"
+				effort="12.0" velocity="6.597" />
+			<dynamics friction="0.2" damping="0.0952" />
+		</joint>
+		<xacro:fr05h101 name="dual_axis1_top" />
+		<xacro:fr05h101 name="dual_axis2_top" />
+		<joint name="dual_axis1_top_fixed" type="fixed">
+			<parent link="dual_axis_top" />
+			<child link="dual_axis1_top" />
+			<origin xyz="0.037 0 0" />
+		</joint>
+		<joint name="dual_axis2_top_fixed" type="fixed">
+			<parent link="dual_axis_top" />
+			<child link="dual_axis2_top" />
+			<origin xyz="-0.037 0 0" />
+		</joint>
+	</xacro:macro>
+
+	<xacro:macro name="wrist_rotate" >
+		<link name="wrist_back">
+			<visual>
+				<origin xyz="0 0 0.00405" />
+				<geometry>
+					<box size="0.0488 0.03266 0.0081" />
+				</geometry>
+			</visual>
+			<collision>
+				<origin xyz="0 0 0.00405" />
+				<geometry>
+					<box size="0.0488 0.03266 0.0081" />
+				</geometry>
+			</collision>
+			<xacro:box_inertia mass="0.016" width="0.0488" length="0.03266"
+				height="0.0081"/>
+		</link>
+		<link name="wrist_servo">
+			<visual>
+				<origin rpy="0 0 0"
+					xyz="${-mx28at_depth/2} ${-mx28at_width * 0.825} 0" />
+				<geometry>
+					<mesh filename="package://crustcrawler_description/meshes/MX-28AT_AR.STL"
+						scale="0.001 0.001 0.001"/>
+				</geometry>
+			</visual>
+			<collision>
+				<origin xyz="0 -0.012 ${mx28at_width/2}" />
+				<geometry>
+					<box size="${mx28at_depth} ${mx28at_height} ${mx28at_width}" />
+				</geometry>
+			</collision>
+			<xacro:box_inertia mass="0.075" width="${mx28at_width}" length="${mx28at_depth}"
+				height="${mx28at_height}" />
+		</link>
+		<joint name="wrist_rotate_fixed" type="fixed">
+			<parent link="wrist_back" />
+			<child link="wrist_servo" />
+			<origin xyz="0 0 0.0081" />
+		</joint>
+		<link name="wrist_rotate_spacer">
+			<visual>
+				<origin xyz="0 0 0.005" />
+				<geometry>
+					<cylinder length="0.01" radius="0.014"/>
+				</geometry>
+			</visual>
+			<collision>
+				<origin xyz="0 0 0.005" />
+				<geometry>
+					<cylinder length="0.01" radius="0.014"/>
+				</geometry>
+			</collision>
+			<xacro:cylinder_inertia mass="0.013" radius="0.014" height="0.01" />
+		</link>
+		<joint name="joint_6" type="revolute">
+			<parent link="wrist_servo" />
+			<child link="wrist_rotate_spacer" />
+			<axis xyz="0 0 1" />
+			<origin xyz="0 0 ${mx28at_depth + 0.00475}" />
+			<limit
+				lower="${-pi}" upper="${pi}"
+				effort="2.5" velocity="5.76" />
+			<dynamics friction="0.1" damping="0.0454" />
+		</joint>
+	</xacro:macro>
+
+	<!-- Robot arm build starts here: -->
+	<xacro:macro name="crustcrawler_robot">
+		<!-- Dummy link for KDL -->
+		<link name="dummy_root" />
+		<!-- Turntable -->
+		<xacro:turntable name="turntable" />
+		<joint name="turntable_dummy_fixed" type="fixed">
+			<parent link="dummy_root" />
+			<child link="turntable_base" />
+		</joint>
+		<!-- Dual axis servos -->
+		<xacro:dual_axis />
+		<joint name="dual_axis_fixed" type="fixed">
+			<parent link="turntable_disk" />
+			<child link="dual_axis_bottom" />
+			<origin xyz="0 0 ${disk_height}" />
+		</joint>
+		<!-- Large girder -->
+		<xacro:large_girder name="girder1" />
+		<joint name="dual_axis_girder_fixed" type="fixed">
+			<parent link="dual_axis_top" />
+			<child link="girder1" />
+			<origin xyz="0 0 ${large_bracket_height + 0.036}" />
+		</joint>
+		<xacro:small_bracket name="girder1_top" />
+		<joint name="girder1_fixed" type="fixed">
+			<parent link="girder1" />
+			<child link="girder1_top" />
+			<origin xyz="0 0 ${large_girder_height}" />
+		</joint>
+		<!-- Next MX64AT -->
+		<xacro:mx64at_fr05h101_bottom name="joint_3" />
+		<joint name="joint3_bottom_fixed" type="fixed">
+			<parent link="girder1_top" />
+			<child link="joint_3_bottom" />
+			<origin xyz="0 0 ${small_bracket_height}" />
+		</joint>
+		<xacro:small_bracket name="joint3_top" />
+		<joint name="joint3_top_fixed" type="fixed">
+			<parent link="joint_3_bracket" />
+			<child link="joint3_top" />
+			<origin xyz="0 0 ${fr05h101_height - fr05h101_offset}" />
+		</joint>
+		<!-- Small girder -->
+		<xacro:small_girder name="girder2" />
+		<joint name="girder2_bottom_fixed" type="fixed">
+			<parent link="joint3_top" />
+			<child link="girder2" />
+			<origin xyz="0 0 ${small_bracket_height}" />
+		</joint>
+		<xacro:small_bracket name="girder2_top" />
+		<joint name="girder2_top_fixed" type="fixed">
+			<parent link="girder2" />
+			<child link="girder2_top" />
+			<origin xyz="0 0 ${small_girder_height}" />
+		</joint>
+		<xacro:if value="$(arg full_arm)">
+			<xacro:unless value="$(arg tek4030)">
+				<!-- Next MX64AT -->
+				<xacro:mx64at_fr05h101_bottom name="joint_4" />
+				<joint name="joint4_bottom_fixed" type="fixed">
+					<parent link="girder2_top" />
+					<child link="joint_4_bottom" />
+					<origin xyz="0 0 ${small_bracket_height}" />
+				</joint>
+				<!-- First MX28AT -->
+				<xacro:mx28at_fr07h101_bottom name="joint_5" />
+				<joint name="joint5_bottom_fixed" type="fixed">
+					<parent link="joint_4_bracket" />
+					<child link="joint_5_bottom" />
+					<origin xyz="0 0 ${fr05h101_height - fr05h101_offset}" />
+				</joint>
+			</xacro:unless>
+			<xacro:if value="$(arg tek4030)">
+				<!-- Next MX64AT -->
+				<xacro:mx64at_fr05h101_bottom name="joint_4" />
+				<joint name="joint4_bottom_fixed" type="fixed">
+					<parent link="girder2_top" />
+					<child link="joint_4_bottom" />
+					<origin rpy="0 0 ${pi/2}" xyz="0 0 ${small_bracket_height}" />
+				</joint>
+				<!-- Next MX64AT -->
+				<xacro:mx64at_fr05h101_bottom name="joint_5" />
+				<joint name="joint5_bottom_fixed" type="fixed">
+					<parent link="joint_4_bracket" />
+					<child link="joint_5_bottom" />
+					<origin rpy="0 0 ${-pi/2}" xyz="0 0 ${fr05h101_height - fr05h101_offset}" />
+				</joint>
+			</xacro:if>
+			<!-- Wrist rotate -->
+			<xacro:wrist_rotate />
+			<joint name="wrist_rotate_back_fixed" type="fixed">
+				<parent link="joint_5_bracket" />
+				<child link="wrist_back" />
+				<origin xyz="0 0 ${fr07h101_height - fr07h101_offset}" />
+			</joint>
+			<!-- Gripper -->
+			<xacro:if value="$(arg gripper_enabled)">
+				<xacro:gripper />
+				<joint name="gripper_fixed" type="fixed">
+					<parent link="wrist_rotate_spacer" />
+					<child link="gripper_house" />
+					<origin rpy="0 0 ${pi/2}" xyz="0 0 0.01" />
+				</joint>
+			</xacro:if>
+		</xacro:if>
+
+		<!-- Transmissions -->
+		<transmission name="tran1">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="joint_1">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="motor1">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+		<transmission name="tran2">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="joint_2">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="motor2">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+		<transmission name="tran3">
+			<type>transmission_interface/SimpleTransmission</type>
+			<joint name="joint_3">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+			</joint>
+			<actuator name="motor3">
+				<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				<mechanicalReduction>1</mechanicalReduction>
+			</actuator>
+		</transmission>
+		<xacro:if value="$(arg full_arm)">
+			<transmission name="tran4">
+				<type>transmission_interface/SimpleTransmission</type>
+				<joint name="joint_4">
+					<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				</joint>
+				<actuator name="motor4">
+					<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+					<mechanicalReduction>1</mechanicalReduction>
+				</actuator>
+			</transmission>
+			<transmission name="tran5">
+				<type>transmission_interface/SimpleTransmission</type>
+				<joint name="joint_5">
+					<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				</joint>
+				<actuator name="motor5">
+					<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+					<mechanicalReduction>1</mechanicalReduction>
+				</actuator>
+			</transmission>
+			<transmission name="tran6">
+				<type>transmission_interface/SimpleTransmission</type>
+				<joint name="joint_6">
+					<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+				</joint>
+				<actuator name="motor6">
+					<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+					<mechanicalReduction>1</mechanicalReduction>
+				</actuator>
+			</transmission>
+			<xacro:if value="$(arg gripper_enabled)">
+				<transmission name="tran7">
+					<type>transmission_interface/SimpleTransmission</type>
+					<joint name="gripper_left_joint">
+						<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+					</joint>
+					<actuator name="motor7">
+						<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+						<mechanicalReduction>1</mechanicalReduction>
+					</actuator>
+				</transmission>
+				<transmission name="tran8">
+					<type>transmission_interface/SimpleTransmission</type>
+					<joint name="gripper_right_joint">
+						<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+					</joint>
+					<actuator name="motor8">
+						<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+						<mechanicalReduction>1</mechanicalReduction>
+					</actuator>
+				</transmission>
+			</xacro:if>
+		</xacro:if>
+	</xacro:macro>
+</robot>

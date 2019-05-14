@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot name="crustcrawler" xmlns:xacro="http://ros.org/wiki/xacro">
+	<!-- Arguments that can be passed to this URDF file: -->
+	<xacro:arg name="gripper_enabled" default="false" />
+	<xacro:arg name="full_arm" default="true" />
+	<xacro:arg name="tek4030" default="false" />
+	<!-- Imports of other parts -->
+	<xacro:include filename="$(find crustcrawler_description)/urdf/crustcrawler.urdf.xacro" />
+	<!-- Build robot from included parts -->
+	<xacro:crustcrawler_robot />
+</robot>

@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<launch>
+	<!-- Should the gripper be used: -->
+	<arg name="gripper_enabled" default="true" />
+	<arg name="full_arm" default="false" />
+	<arg name="tek4030" default="false" />
+
+	<param name="robot_description" command="$(find xacro)/xacro --inorder
+		'$(find crustcrawler_gazebo)/urdf/crustcrawler.gazebo.xacro'
+		gripper_enabled:=$(arg gripper_enabled) full_arm:=$(arg full_arm) tek4030:=$(arg tek4030)
+		" />
+
+	<!-- Spawn robot in gazebo -->
+	<node name="spawn_crustcrawler_model" pkg="gazebo_ros" type="spawn_model"
+		args="-urdf -param robot_description -model crustcrawler_gazebo"/>
+</launch>

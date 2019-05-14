@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+	<xacro:include filename="$(find crustcrawler_description)/urdf/inertias.urdf.xacro" />
+
+	<xacro:property name="gripper_house_width" value="0.070" />
+	<xacro:property name="gripper_house_length" value="0.04" />
+	<xacro:property name="gripper_house_height" value="0.053" />
+	<xacro:property name="gripper_house_weight" value="0.204" />
+
+	<xacro:macro name="gripper_house">
+		<link name="gripper_house">
+			<visual>
+				<origin xyz="${-gripper_house_width/2} 0.019 0"
+					rpy="${pi/2} 0 0 "/>
+				<geometry>
+					<mesh filename="package://crustcrawler_description/meshes/GRIPPER_HOUSE.STL"
+						scale="0.001 0.001 0.001"/>
+				</geometry>
+			</visual>
+			<collision>
+				<origin xyz="0 0 ${gripper_house_height/2}" />
+				<geometry>
+					<box size="${gripper_house_width} ${gripper_house_length}
+						${gripper_house_height}" />
+				</geometry>
+			</collision>
+			<xacro:box_inertia mass="${gripper_house_weight}"
+				width="${gripper_house_width}" length="${gripper_house_length}"
+				height="${gripper_house_height}" />
+		</link>
+	</xacro:macro>
+
+	<xacro:macro name="gripper">
+		<xacro:gripper_house />
+		<link name="gripper_left">
+			<visual>
+				<origin xyz="0.0133 -0.0285 0.0373" rpy="0 ${pi/2} ${pi/2}" />
+				<geometry>
+					<mesh filename="package://crustcrawler_description/meshes/GRIPPER_LEFT.STL"
+						scale="0.001 0.001 0.001"/>
+				</geometry>
+			</visual>
+			<collision>
+				<origin xyz="0.0133 -0.0285 0.0373" rpy="0 ${pi/2} ${pi/2}" />
+				<geometry>
+					<mesh filename="package://crustcrawler_description/meshes/GRIPPER_LEFT.STL"
+						scale="0.001 0.001 0.001"/>
+				</geometry>
+			</collision>
+			<!-- NOTE most of the weight of the gripper is in the house so
+					 this is only necessary because Gazebo requires each link to
+					 have weight -->
+			<xacro:box_inertia mass="0.001"
+				width="0.037" length="0.045" height="0.037" />
+		</link>
+		<link name="gripper_right">
+			<visual>
+				<origin xyz="-0.0133 -0.0285 -0.0273" rpy="0 ${-pi/2} ${-pi/2}" />
+				<geometry>
+					<mesh filename="package://crustcrawler_description/meshes/GRIPPER_RIGHT.STL"
+						scale="0.001 0.001 0.001"/>
+				</geometry>
+			</visual>
+			<collision>
+				<origin xyz="-0.0133 -0.0285 -0.0273" rpy="0 ${-pi/2} ${-pi/2}" />
+				<geometry>
+					<mesh filename="package://crustcrawler_description/meshes/GRIPPER_RIGHT.STL"
+						scale="0.001 0.001 0.001"/>
+				</geometry>
+			</collision>
+			<!-- NOTE most of the weight of the gripper is in the house so
+					 this is only necessary because Gazebo requires each link to
+					 have weight -->
+			<xacro:box_inertia mass="0.001"
+				width="0.037" length="0.045" height="0.037" />
+		</link>
+		<joint name="gripper_left_joint" type="revolute">
+			<parent link="gripper_house" />
+			<child link="gripper_left" />
+			<origin xyz="-0.0188 0 0.0415" rpy="0 0.65 0" />
+			<axis xyz="0 -1 0" />
+			<limit
+				effort="1.8" velocity="10.16" />
+			<dynamics friction="0.1" />
+		</joint>
+		<joint name="gripper_right_joint" type="revolute">
+			<parent link="gripper_house" />
+			<child link="gripper_right" />
+			<origin xyz="0.0188 0 0.0415" rpy="0 -0.65 0" />
+			<axis xyz="0 -1 0" />
+			<limit
+				effort="1.8" velocity="10.16" />
+			<dynamics friction="0.1" />
+		</joint>
+	</xacro:macro>
+
+</robot>

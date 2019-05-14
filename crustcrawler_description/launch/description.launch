@@ -1,0 +1,18 @@
+<!-- This launch file spawns the CrustCrawler robot in ROS -->
+<launch>
+	<!-- Custom arguments that can be passed to this file, e.g. `paused:=true` -->
+
+	<!-- Should the model include the gripper attachment? -->
+	<arg name="gripper_enabled" default="true" />
+	<!-- Should we spawn rviz to visualize the model? -->
+	<arg name="spawn_rviz" default="false" />
+
+	<!-- Convert xacro into URDF -->
+	<param name="robot_description"
+		command="$(find xacro)/xacro --inorder '$(find crustcrawler_description)/urdf/crustcrawler.xacro'
+		gripper_enabled:=$(arg gripper_enabled)
+		" />
+
+	<node if="$(arg spawn_rviz)" name="rviz" pkg="rviz" type="rviz" required="true" />
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+</launch>

@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+	<xacro:include filename="$(find crustcrawler_description)/urdf/inertias.urdf.xacro" />
+
+	<xacro:property name="mx64at_width" value="0.05" />
+	<xacro:property name="mx64at_depth" value="0.0402" />
+	<xacro:property name="mx64at_height" value="0.0611" />
+
+	<xacro:property name="fr05h101_width" value="0.051" />
+	<xacro:property name="fr05h101_depth" value="0.033" />
+	<xacro:property name="fr05h101_height" value="0.039" />
+	<xacro:property name="fr05h101_offset" value="0.0028" />
+
+	<xacro:macro name="mx64at" params="name rpy">
+		<link name="${name}">
+			<visual>
+				<origin rpy="${pi/2} 0 ${pi/2}"
+					xyz="${-mx64at_width/2} ${-mx64at_depth/2} 0" />
+				<geometry>
+					<mesh filename="package://crustcrawler_description/meshes/MX-64AT_AR.STL"
+						scale="0.001 0.001 0.001"/>
+				</geometry>
+			</visual>
+
+			<collision>
+				<origin rpy="${rpy}" xyz="0 0 ${mx64at_height/2}" />
+				<geometry>
+					<box size="${mx64at_width} ${mx64at_depth} ${mx64at_height}" />
+				</geometry>
+			</collision>
+
+			<inertial>
+				<!-- Based on: references/RX-64_INERTIA.pdf -->
+				<mass value="0.1295" />
+				<orign xyz="0.00015830659 -0.07024195 0.0016784123" rpy="${rpy}" />
+				<inertia
+					ixx="0.05645784" ixy="-0.65234321" ixz="0.64699697"
+					iyy="0.029325728" iyz="-0.0058929492"
+					izz="0.045111809" />
+			</inertial>
+		</link>
+	</xacro:macro>
+
+	<xacro:macro name="fr05h101" params="name">
+		<link name="${name}">
+			<visual>
+				<origin rpy="${pi/2} 0 0"
+					xyz="${-fr05h101_width/2} ${fr05h101_depth/2} ${-fr05h101_offset}" />
+				<geometry>
+					<mesh filename="package://crustcrawler_description/meshes/FR05-H101.STL"
+						scale="0.001 0.001 0.001"/>
+				</geometry>
+			</visual>
+
+			<collision>
+				<origin xyz="0 0 ${fr05h101_height/2 - fr05h101_offset}" />
+				<geometry>
+					<box size="${fr05h101_width} ${fr05h101_depth} ${fr05h101_height - fr05h101_offset}" />
+				</geometry>
+			</collision>
+
+			<xacro:box_inertia mass="0.016" width="${fr05h101_width}"
+				length="${fr05h101_depth}" height="${fr05h101_height}"	/>
+		</link>
+	</xacro:macro>
+
+	<xacro:macro name="mx64at_bottom" params="name">
+		<link name="${name}">
+			<visual>
+				<origin xyz="0 0 0.005" />
+				<geometry>
+					<box size="0.038 0.034 0.01" />
+				</geometry>
+			</visual>
+			<collision>
+				<origin xyz="0 0 0.005" />
+				<geometry>
+					<box size="0.038 0.034 0.01" />
+				</geometry>
+			</collision>
+			<xacro:box_inertia mass="0.0085" width="0.038" length="0.034"
+				height="0.01"/>
+		</link>
+	</xacro:macro>
+
+	<!-- Use the following macros when building models: -->
+	<xacro:macro name="mx64at_fr05h101" params="name">
+		<xacro:mx64at name="${name}_servo" rpy="0 0 0" />
+		<xacro:fr05h101 name="${name}_bracket" />
+		<joint name="${name}" type="revolute">
+			<parent link="${name}_servo" />
+			<child link="${name}_bracket" />
+			<origin xyz="-0.0025 0 0.0481" />
+			<limit
+				lower="-1.9" upper="1.9"
+				effort="6.0" velocity="6.597" />
+			<dynamics friction="0.1" damping="0.0952" />
+		</joint>
+	</xacro:macro>
+
+	<xacro:macro name="mx64at_with_bottom" params="name">
+		<xacro:mx64at_bottom name="${name}_bottom" />
+		<xacro:mx64at name="${name}_servo" rpy="0 0 0" />
+		<joint name="${name}_joint" type="fixed">
+			<parent link="${name}_bottom" />
+			<child link="${name}_servo" />
+			<origin xyz="0.0025 0 0.005" />
+		</joint>
+	</xacro:macro>
+
+	<xacro:macro name="mx64at_fr05h101_bottom" params="name">
+		<xacro:mx64at_bottom name="${name}_bottom" />
+		<xacro:mx64at_fr05h101 name="${name}" />
+		<joint name="${name}_fixed_joint" type="fixed">
+			<parent link="${name}_bottom" />
+			<child link="${name}_servo" />
+			<origin xyz="0.0025 0 0.005" />
+		</joint>
+	</xacro:macro>
+
+</robot>
